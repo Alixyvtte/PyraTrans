@@ -21,8 +21,6 @@ class CharBERTModel(nn.Module):
 
         self.pooler = BertPooler(config)
 
-        self.init_weights()
-
     def get_input_embeddings(self):
         return self.embeddings.word_embeddings
 
