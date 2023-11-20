@@ -28,13 +28,14 @@ def dataPreprocess_bert(filename, input_ids, input_types, input_masks, label, ur
             x1 = tokenizer.tokenize(x1)
             tokens = ["[CLS]"] + x1 + ["[SEP]"]
 
-            # input_id, seg_id, att_mask
+            # Get input_id, seg_id, att_mask
             ids = tokenizer.convert_tokens_to_ids(tokens)
             types = [0] * (len(ids))
             masks = [1] * len(ids)
 
+            # Pad if short, truncate if long
             if len(ids) < pad_size:
-                types = types + [1] * (pad_size - len(ids))  
+                types = types + [1] * (pad_size - len(ids))  # Set segment to 1 for the masked part
                 masks = masks + [0] * (pad_size - len(ids))
                 ids = ids + [0] * (pad_size - len(ids))
             else:
@@ -57,7 +58,9 @@ def dataPreprocess_charbert(filename, input_ids, input_types, input_masks, char_
                             urltype):
     """
     Preprocess data from a file containing URLs and labels.
-
+    :param end_ids: Charbert Input
+    :param start_ids: Charbert Input
+    :param char_ids: Charbert Input
     :param filename: The path to the data file.
     :param input_ids: List to store input char IDs.
     :param input_types: List to store segment IDs.
@@ -69,13 +72,11 @@ def dataPreprocess_charbert(filename, input_ids, input_types, input_masks, char_
     pad_size = 200
     # Also known as max_len (Based on preliminary analysis,
     # the maximum text length is 38, taking 32 to cover 99%)
-    bert_path = "charbert-bert-wiki/"
+    bert_path = "/content/drive/MyDrive/charbert-bert-wiki/"
     tokenizer = BertTokenizer(vocab_file=bert_path + "vocab.txt")  # Initialize the tokenizer
     with open(filename, encoding='utf-8') as f:
         for i, l in tqdm(enumerate(f)):
-            char = []
-            start = []
-            end = []
+
             x1 = l.strip()
             x1 = tokenizer.tokenize(x1)
             tokens = ["[CLS]"] + x1 + ["[SEP]"]
@@ -86,18 +87,20 @@ def dataPreprocess_charbert(filename, input_ids, input_types, input_masks, char_
             masks = [1] * len(ids)
 
             if len(ids) < pad_size:
-                types = types + [1] * (pad_size - len(ids)) 
+                types = types + [1] * (pad_size - len(ids))
                 masks = masks + [0] * (pad_size - len(ids))
                 ids = ids + [0] * (pad_size - len(ids))
             else:
                 types = types[:pad_size]
                 masks = masks[:pad_size]
                 ids = ids[:pad_size]
+
             input_ids.append(ids)
             input_types.append(types)
             input_masks.append(masks)
 
-            char, start, end = CharbertInput(ids, char, start, end)
+            char, start, end = CharbertInput(ids)
+
             char_ids.append(char)
             start_ids.append(start)
             end_ids.append(end)
@@ -130,11 +133,6 @@ def dataPreprocessFromCSV(filename, input_ids, input_types, input_masks, label, 
     start_ids = []
     end_ids = []
     for i, row in tqdm(data.iterrows(), total=len(data)):
-
-        char = []
-        start = []
-        end = []
-
         x1 = row['url']  # Replace with the column name in your CSV file where the text data is located
         x1 = tokenizer.tokenize(x1)
         tokens = ["[CLS]"] + x1 + ["[SEP]"]
@@ -157,7 +155,7 @@ def dataPreprocessFromCSV(filename, input_ids, input_types, input_masks, label, 
         input_types.append(types)
         input_masks.append(masks)
         if is_CharBert:
-            char, start, end = CharbertInput(ids, char, start, end)
+            char, start, end = CharbertInput(ids)
             char_ids.append(char)
             start_ids.append(start)
             end_ids.append(end)
@@ -275,16 +273,19 @@ def load_char_to_ids_dict(char_vocab_file):
     return vocab
 
 
-def CharbertInput(context, char_ids, start_ids, end_ids):
+def CharbertInput(context):
     """Create the additional input for CharBERT."""
-    bert_path = "charbert-bert-wiki/"
+    bert_path = "/content/drive/MyDrive/charbert-bert-wiki/"
     tokenizer = BertTokenizer(vocab_file=bert_path + "vocab.txt")
-    char_vocab_file = "./data/dict/bert_char_vocab.txt"
+    char_vocab_file = "../vocab.txt"
     char2ids_dict = load_char_to_ids_dict(char_vocab_file=char_vocab_file)
     max_length = 200
-    char_maxlen = max_length
+    char_maxlen = 200
     token = tokenizer.convert_ids_to_tokens(context)
     token = " ".join(token)
+    char_ids=[]
+    start_ids=[]
+    end_ids=[]
 
     token = token.strip("##")
     if len(char_ids) < char_maxlen:
@@ -300,8 +301,9 @@ def CharbertInput(context, char_ids, start_ids, end_ids):
 
         if c in char2ids_dict:
             cid = char2ids_dict[c]
-            char_ids.append(cid)
-
+        else:
+            cid = char2ids_dict["[UNK]"]
+        char_ids.append(cid)
     if len(char_ids) > char_maxlen:
         char_ids = char_ids[:char_maxlen]
     else:

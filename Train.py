@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import time
 from data_processing import dataPreprocess_bert, spiltDatast_bert, dataPreprocess_charbert, spiltDatast_charbert
-from Model_PMA import Model, CharBertModel
+from Model_MMA import Model, CharBertModel
 
 
 def train(model, device, train_loader, optimizer, epoch):  # Train the model
