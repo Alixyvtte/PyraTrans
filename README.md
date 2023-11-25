@@ -1,4 +1,4 @@
-# Advanced-Malicious-URL-Detection-MMANet
+# PyraTrans
 This is an implementation of the paper - "PyraTrans: Learning Attention-Enriched Multi-Scale Pyramid Network from Pre-Trained Transformers for Effective Malicious URL Detection"
 
 ## Overview
