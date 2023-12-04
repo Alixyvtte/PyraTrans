@@ -1,5 +1,5 @@
 # PyraTrans
-This is an implementation of the paper - "PyraTrans: Learning Attention-Enriched Multi-Scale Pyramid Network from Pre-Trained Transformers for Effective Malicious URL Detection"
+This is an implementation of the [paper](https://arxiv.org/abs/2312.00508) - "PyraTrans: Learning Attention-Enriched Multi-Scale Pyramid Network from Pre-Trained Transformers for Effective Malicious URL Detection"
 
 ## Overview
 
