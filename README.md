@@ -17,7 +17,7 @@ The proposed framework, which is based on a character-aware pretrained language 
 | /character_bert_wiki     | Where the pre-trained model CharBERT based on BERT is stored. You can also download using  [this](https://drive.google.com/file/d/1rF5_LbA2qIHuehnNepGmjz4Mu6OqEzYT/view?usp=sharing) link. |
 | attention.py             | Contains the proposed channel attention model.               |
 | data_processing.py       | Contains functions for preprocessing the dataset, including converting URL strings into BERT's input format and splitting it into training and validation sets. |
-| Model_PMA.py             | Where the proposed Malicious URL Detection PMANet architecture is stored. |
+| Model_MMA.py             | Where the proposed Malicious URL Detection PyraTrans architecture is stored. |
 | Model_CharBERT.py        | This file contains the original CharBERT model part.         |
 | Train.py                 | Trains the model according to given parameters, You need to modify the "*pre-trained model path*" and "*dataset path*". |
 | Test_binary.py           | Tests the pre-trained model in the binary classification experiments according to given parameters. |
